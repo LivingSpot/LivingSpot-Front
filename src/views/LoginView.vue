@@ -4,15 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you 
 import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 
-// 소셜 로그인 설정
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const KAKAO_CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
-const NAVER_CLIENT_ID = import.meta.env.VITE_NAVER_CLIENT_ID;
-
-// 소셜 로그인 리다이렉트 URI
-const GOOGLE_REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
-const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
-const NAVER_REDIRECT_URI = import.meta.env.VITE_NAVER_REDIRECT_URI;
+// 소셜 로그인 로그인 URI
+const GOOGLE_LOGIN_URL = import.meta.env.VITE_GOOGLE_LOGIN_URI;
+const KAKAO_LOGIN_URL = import.meta.env.VITE_KAKAO_LOGIN_URI;
+const NAVER_LOGIN_URL = import.meta.env.VITE_NAVER_LOGIN_URI;
 
 const route = useRoute();
 const router = useRouter();
@@ -40,35 +35,16 @@ const onLogin = () => {
 };
 
 const googleLogin = () => {
-  const googleAuthUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-  googleAuthUrl.searchParams.append("client_id", GOOGLE_CLIENT_ID);
-  googleAuthUrl.searchParams.append("redirect_uri", GOOGLE_REDIRECT_URI);
-  googleAuthUrl.searchParams.append("response_type", "code");
-  googleAuthUrl.searchParams.append("scope", "email profile");
-  
-  window.location.href = googleAuthUrl.toString();
+  window.location.href = GOOGLE_LOGIN_URL.toString();
 };
 
 const kakaoLogin = () => {
-  const kakaoAuthUrl = new URL("https://kauth.kakao.com/oauth/authorize");
-  kakaoAuthUrl.searchParams.append("client_id", KAKAO_CLIENT_ID);
-  kakaoAuthUrl.searchParams.append("redirect_uri", KAKAO_REDIRECT_URI);
-  kakaoAuthUrl.searchParams.append("response_type", "code");
-  
-  window.location.href = kakaoAuthUrl.toString();
+  window.location.href = KAKAO_LOGIN_URL.toString();
 };
 
 const naverLogin = () => {
-  const state = Math.random().toString(36).substring(2);
-  const naverAuthUrl = new URL("https://nid.naver.com/oauth2.0/authorize");
-  naverAuthUrl.searchParams.append("client_id", NAVER_CLIENT_ID);
-  naverAuthUrl.searchParams.append("redirect_uri", NAVER_REDIRECT_URI);
-  naverAuthUrl.searchParams.append("response_type", "code");
-  naverAuthUrl.searchParams.append("state", state);
-  
-  window.location.href = naverAuthUrl.toString();
+  window.location.href = NAVER_LOGIN_URL.toString();
 };
-
 </script>
 <script>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons

@@ -1,10 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainPage from "@/views/MainPage.vue";
 
-import GoogleCallback from '../views/oauth/GoogleCallback.vue';
-import KakaoCallback from '../views/oauth/KakaoCallback.vue';
-import NaverCallback from '../views/oauth/NaverCallback.vue';
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -61,21 +57,6 @@ const router = createRouter({
       name: "join",
       component: () => import("../views/JoinView.vue"),
       meta: { layout: "none" }, // 로그인 페이지는 특별한 레이아웃 없음
-    },
-    {
-      path: '/oauth/callback/google',
-      name: 'googleCallback',
-      component: GoogleCallback
-    },
-    {
-      path: '/oauth/callback/kakao',
-      name: 'kakaoCallback',
-      component: KakaoCallback
-    },
-    {
-      path: '/oauth/callback/naver',
-      name: 'naverCallback',
-      component: NaverCallback
     },
   ],
 });
