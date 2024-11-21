@@ -1,8 +1,25 @@
-<script>
+<script setup>
 import UserDropDownMenu from "@/components/Header/UserDropDownMenu.vue";
 import HeaderSearch from "@/components/Header/HeaderSearch.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons
 import InputComponent from "@/components/InputComponent.vue";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
+
+const userStore = useUserStore();
+const router = useRouter();
+
+// 로그인/로그아웃 버튼 클릭 시 동작
+const handleAuthAction = () => {
+  if (userStore.isLoggedIn) {
+    userStore.logout();
+    router.push("/");
+  } else {
+    router.push("/login");
+  }
+};
+
+</script>
 
 export default {
   components: {
@@ -20,7 +37,6 @@ export default {
     ],
   }),
 };
-</script>
 
 <template>
   <div
@@ -60,11 +76,16 @@ export default {
         /><span>USER INFO</span>
       </div>
 
-      <div
+     <!-- 로그인/로그아웃 버튼 -->
+     <div
         class="bg-blue-700 h-10 w-28 cursor-pointer text-sm font-extrabold rounded-md flex items-center justify-center shadow-xl text-white"
+        @click="handleAuthAction"
       >
-        <font-awesome-icon icon="fa-solid fa-right-to-bracket" class="mr-3" />
-        <span>LOGOUT</span>
+        <font-awesome-icon
+          icon="fa-solid fa-right-to-bracket"
+          class="mr-3"
+        />
+        <span>{{ userStore.isLoggedIn ? "LOGOUT" : "LOGIN" }}</span>
       </div>
     </div>
   </div>

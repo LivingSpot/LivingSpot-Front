@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainPage from "@/views/MainPage.vue";
+import { useUserStore } from "@/stores/userStore";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -64,6 +66,17 @@ const router = createRouter({
       component: () => import('@/views/OAuth2Handler.vue'),
     },
   ],
+});
+
+
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
+  
+  if (!userStore.isLoggedIn && localStorage.getItem("access_token")) {
+    await userStore.fetchUserInfo(); // 사용자 정보를 미리 로드
+  }
+  
+  next();
 });
 
 export default router;

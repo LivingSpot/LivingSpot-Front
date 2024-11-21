@@ -3,9 +3,11 @@ import { useRouter, useRoute } from "vue-router";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons
 import { ref } from "vue";
 import SideOptionMenu from "@/components/SideOptionMenu.vue";
+import { useUserStore } from "@/stores/userStore"
 
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const isOpened = ref(false);
 
@@ -46,6 +48,7 @@ const goSettings = () => {
   isOpened.value = false;
   router.push({ name: "settings" });
 };
+const logout = () => userStore.logout(); // 로그아웃
 </script>
 
 <template>
@@ -67,25 +70,21 @@ const goSettings = () => {
           </div>
         </div>
       </div>
-      <!-- USER AVATER -->
+      <!-- USER AVATAR -->
       <div class="flex flex-col items-center mt-16 gap-y-2">
         <v-avatar size="115">
-          <v-img alt="John" src="https://cdn.vuetifyjs.com/images/john.jpg">
-          </v-img>
+          <v-img
+            alt="User Avatar"
+            :src="userStore.user?.profilePicture || 'https://via.placeholder.com/150'"
+          ></v-img>
         </v-avatar>
 
         <div class="flex flex-col">
           <div class="text-xl font-extrabold flex flex-row items-center">
-            <span>LEE JIN GYU</span>
-            <v-btn
-              class="text-sm mx-2"
-              color="gray"
-              icon="mdi-wrench"
-              size="small"
-            ></v-btn>
+            <span>{{ userStore.user?.name || 'Guest' }}</span>
           </div>
           <div class="text-md font-semibold text-slate-500">
-            aiduriaaa@gmail.com
+            {{ userStore.user?.email || 'guest@example.com' }}
           </div>
         </div>
       </div>
@@ -186,6 +185,7 @@ const goSettings = () => {
       </div>
       <div
         class="text-[#bcbcbc] absolute bottom-0 w-full h-[50px] flex items-center justify-start font-extrabold text-lg ml-12"
+        @click="logout"
       >
         <font-awesome-icon icon="fa-solid fa-right-to-bracket" class="mr-3" />
         <div class="cursor-pointer">Exit</div>
