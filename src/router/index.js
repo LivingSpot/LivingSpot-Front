@@ -58,6 +58,11 @@ const router = createRouter({
       component: () => import("../views/JoinView.vue"),
       meta: { layout: "none" }, // 로그인 페이지는 특별한 레이아웃 없음
     },
+    {
+      path: '/auth/oauth2-jwt-header',
+      name: 'OAuth2Handler',
+      component: () => import('@/views/OAuth2Handler.vue'),
+    },
   ],
 });
 
