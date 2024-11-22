@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: "/like",
       name: "like",
-      component: () => import("../views/LikeView.vue"),
+      component: () => import("../views/KaKaoMapView.vue"),
       meta: { layout: "default" }, // 기본 레이아웃
     },
     {

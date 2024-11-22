@@ -1,11 +1,12 @@
 <script setup>
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons
-
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
+// import { useUserStore } from "@/stores/login";
 
 const route = useRoute();
 const router = useRouter();
+// const userStore = useUserStore();
 
 const goJoin = () => {
   router.push({ name: "join" });
@@ -51,6 +52,23 @@ export default {
       },
     ],
   }),
+};
+
+const login = async () => {
+  try {
+    // Your login logic here
+    const response = await loginApi.login(username.value, password.value);
+
+    if (response.status === 200) {
+      await loginStore.setToken(response.data.token);
+      localStorage.setItem("access_token", response.data.token);
+      await loginStore.getUserInfo();
+
+      await router.push({ path: "/" });
+    }
+  } catch (e) {
+    alert(e.response.data.message);
+  }
 };
 </script>
 
