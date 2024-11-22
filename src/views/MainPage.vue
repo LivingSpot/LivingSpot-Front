@@ -1,8 +1,20 @@
 <script setup>
+import { onMounted } from "vue";
 import MainKaKaoMap from "@/components/MainKaKaoMap.vue";
 import SideNavBar from "@/components/SideNavBar.vue";
 import HeadNavBar from "@/components/HeadNavBar.vue";
 import { useRouter, useRoute, RouterLink, RouterView } from "vue-router";
+
+import { useUserStore } from "@/stores/userStore";
+
+const userStore = useUserStore();
+
+onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    await userStore.fetchUserInfo(); // 유저 정보 가져오기
+  }
+});
+
 </script>
 
 <template>

@@ -1,12 +1,16 @@
 <script setup>
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons
+
 import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
-// import { useUserStore } from "@/stores/login";
+
+// 소셜 로그인 로그인 URI
+const GOOGLE_LOGIN_URL = import.meta.env.VITE_GOOGLE_LOGIN_URI;
+const KAKAO_LOGIN_URL = import.meta.env.VITE_KAKAO_LOGIN_URI;
+const NAVER_LOGIN_URL = import.meta.env.VITE_NAVER_LOGIN_URI;
 
 const route = useRoute();
 const router = useRouter();
-// const userStore = useUserStore();
 
 const goJoin = () => {
   router.push({ name: "join" });
@@ -28,6 +32,18 @@ const onLogin = () => {
     password.value = "";
     router.push({ name: "login" });
   }
+};
+
+const googleLogin = () => {
+  window.location.href = GOOGLE_LOGIN_URL.toString();
+};
+
+const kakaoLogin = () => {
+  window.location.href = KAKAO_LOGIN_URL.toString();
+};
+
+const naverLogin = () => {
+  window.location.href = NAVER_LOGIN_URL.toString();
 };
 </script>
 <script>
@@ -52,23 +68,6 @@ export default {
       },
     ],
   }),
-};
-
-const login = async () => {
-  try {
-    // Your login logic here
-    const response = await loginApi.login(username.value, password.value);
-
-    if (response.status === 200) {
-      await loginStore.setToken(response.data.token);
-      localStorage.setItem("access_token", response.data.token);
-      await loginStore.getUserInfo();
-
-      await router.push({ path: "/" });
-    }
-  } catch (e) {
-    alert(e.response.data.message);
-  }
 };
 </script>
 
@@ -121,9 +120,9 @@ const login = async () => {
             <span class="text-slate-400 font-extrabold">OTHER</span>
           </div>
         </div>
-
         <div class="flex flex-col gap-y-3 w-full -mt-8">
           <div
+            @click="googleLogin"
             class="hover:opacity-80 transition-all duration-200 bg-slate-50 h-10 cursor-pointer text-sm font-extrabold rounded-md flex items-center justify-center shadow-xl text-white"
           >
             <img
@@ -132,12 +131,14 @@ const login = async () => {
             /><span class="text-black">GOOGLE</span>
           </div>
           <div
+            @click="naverLogin"
             class="hover:opacity-80 transition-all duration-200 bg-[#03C75A] h-10 cursor-pointer text-sm font-extrabold rounded-md flex items-center justify-center shadow-xl text-white"
           >
             <div class="mr-4 text-2xl">N</div>
             <span>NAVER</span>
           </div>
           <div
+            @click="kakaoLogin"
             class="hover:opacity-80 transition-all duration-200 bg-[#FEE500] h-10 cursor-pointer text-sm font-extrabold rounded-md flex items-center justify-center shadow-xl text-white"
           >
             <img
