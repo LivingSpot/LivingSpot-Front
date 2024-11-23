@@ -1,28 +1,32 @@
 import axios from "axios";
 
 /**
- * 회원가입 api
+ * 회원가입 API
  * @param userEmail
  * @param userName
- * @param userNickname
  * @param password
+ * @param profileImage
  * @returns {Promise<axios.AxiosResponse<any>>}
  */
-export async function signup(userEmail, userName, userNickname, password) {
-  const signUpDto = {
-    userEmail,
-    userName,
-    userNickname,
-    password,
-  };
+
+export async function signup(userEmail, userName, password, profileImage) {
+  // FormData를 사용하여 데이터를 전송
+  const formData = new FormData();
+  formData.append("email", userEmail);
+  formData.append("name", userName);
+  formData.append("password", password);
+
+  if (profileImage) {
+    formData.append("profileImageUrl", profileImage); // 프로필 이미지 추가
+  }
 
   try {
     // axios를 이용해 POST 요청
-    console.log("post요청중!!!");
+    console.log("POST 요청 중...");
     return axios({
       method: "post",
-      url: "http://localhost:8080/signup",
-      data: signUpDto,
+      url: "http://localhost:8080/member/signup",
+      data: formData,
       headers: {
         "Content-Type": "application/json",
       },

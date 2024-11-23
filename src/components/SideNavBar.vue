@@ -48,6 +48,7 @@ const goSettings = () => {
   isOpened.value = false;
   router.push({ name: "settings" });
 };
+const login = () => userStore.login();
 const logout = () => userStore.logout(); // 로그아웃
 </script>
 
