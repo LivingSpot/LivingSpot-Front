@@ -1,6 +1,6 @@
 <script setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"; // Assuming you are using FontAwesome for icons
-
+import axios from "@/plugins/axios";
 import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 
@@ -16,21 +16,38 @@ const goJoin = () => {
   router.push({ name: "join" });
 };
 
+
+// 이메일과 비밀번호 입력 값을 관리하는 Ref 변수
 const email = ref("");
-const nickname = ref("");
 const password = ref("");
 
-const onLogin = () => {
-  console.log("로그인 버튼 클릭!!!");
-  console.log(email.value);
-  console.log(password.value);
-  if (email.value == "ssafy" && password.value == "1234") {
-    router.push({ name: "main" });
-  } else {
-    alert("로그인 실패");
+const onLogin = async () => {
+  try {
+    console.log("로그인 시도:", email.value, password.value);
+
+    // 백엔드로 로그인 요청
+    const response = await axios.post("/auth/login", {
+      email: email.value,
+      password: password.value,
+    });
+
+    // 응답 헤더에서 access_token 추출
+    const accessToken = response.headers["authorization"]?.replace("Bearer ", "");
+
+    if (!accessToken) {
+      throw new Error("Access token not found in response headers.");
+    }
+
+    // 로컬 스토리지에 저장
+    localStorage.setItem("access_token", accessToken);
+    console.log("로그인 성공, 액세스 토큰 저장:", accessToken);
+
+    router.push({ name: "main" }); // 메인 페이지로 이동
+  } catch (error) {
+    console.error("로그인 실패:", error.response?.data?.message || error.message);
+    alert("로그인 실패: " + (error.response?.data?.message || "알 수 없는 오류"));
     email.value = "";
     password.value = "";
-    router.push({ name: "login" });
   }
 };
 
