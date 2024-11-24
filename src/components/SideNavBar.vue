@@ -150,31 +150,6 @@ const logout = () => userStore.logout(); // 로그아웃
               class="mr-2 w-[14px]"
             />커뮤니티
           </div>
-          <!-- <div
-            :class="[
-              'py-3 px-6 rounded-lg cursor-pointer flex items-center',
-              route.name === 'other2' ? 'bg-[#f2f1ee]' : 'hover:bg-slate-100',
-            ]"
-            @click="goOther2"
-          >
-            <font-awesome-icon
-              icon="fa-solid fa-network-wired"
-              class="mr-2"
-            />OTHER 2
-          </div> -->
-
-          <!-- <div
-            :class="[
-              'py-3 px-6 rounded-lg cursor-pointer flex items-center',
-              route.name === 'mypage' ? 'bg-[#f2f1ee]' : 'hover:bg-slate-100',
-            ]"
-            @click="goMyPage"
-          >
-            <font-awesome-icon
-              icon="fa-solid fa-circle-info"
-              class="mr-2"
-            />MYPAGE
-          </div> -->
           <div
             :class="[
               'py-3 px-6 rounded-lg cursor-pointer flex items-center',
