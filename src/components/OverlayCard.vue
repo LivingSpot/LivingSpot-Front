@@ -1,6 +1,7 @@
 <script setup>
 import { useHouseStore } from "@/stores/house";
 import { computed, ref } from "vue";
+import axios from "@/plugins/axios";
 
 // Pinia Store
 const houseStore = useHouseStore();
@@ -9,6 +10,11 @@ const houseStore = useHouseStore();
 const computedExcluUseAr = computed(() => {
   return Math.floor(houseStore.selectedHouse.excluUseAr / 3.3058);
 });
+
+// Access Token 가져오기
+const getAccessToken = () => {
+  return localStorage.getItem("access_token") || ""; // 로컬 스토리지에서 access_token 가져오기
+};
 
 // 금액 포맷
 const formatAmount = (amount) => {
@@ -30,11 +36,46 @@ const formatAmount = (amount) => {
 
 // 찜하기 상태
 const isLiked = ref(false);
+const aptSeq = computed(
+  () => houseStore.selectedHouse?.houseInfo?.aptSeq || null
+); // 선택된 아파트 ID
+
+// 서버와 찜 상태 동기화
+const syncLikeStatus = async () => {
+  if (!aptSeq.value) return;
+
+  try {
+    // 서버에 찜 상태를 요청하는 API가 있다고 가정 (옵션 기능)
+    // const response = await axios.get(`/favorite/status?aptSeq=${aptSeq.value}`);
+    // isLiked.value = response.data.isLiked;
+    console.log("Fetched initial favorite status"); // 실제 API가 있다면 위 코드를 활성화
+  } catch (error) {
+    console.error("Failed to fetch like status:", error);
+  }
+};
 
 // 찜하기 토글
-const toggleLike = () => {
-  isLiked.value = !isLiked.value;
+const toggleLike = async () => {
+  if (!aptSeq.value) return;
+
+  try {
+    // 서버로 POST 요청 전송
+    await axios.post("/favorite/toggle", null, {
+      params: { aptSeq: aptSeq.value },
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+    });
+
+    // 로컬 상태 업데이트
+    isLiked.value = !isLiked.value;
+  } catch (error) {
+    console.error("Failed to toggle like:", error);
+  }
 };
+
+// 컴포넌트가 로드될 때 찜 상태 동기화
+syncLikeStatus();
 </script>
 
 <template>
