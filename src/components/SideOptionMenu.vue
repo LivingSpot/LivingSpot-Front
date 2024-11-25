@@ -146,9 +146,10 @@
       </div>
     </div>
   </div>
+  <!-- 찜 목록 화면 -->
   <div v-else class="h-full w-full">
     <div class="w-full px-2 h-full overflow-hidden">
-      <!-- 검색 결과 헤더 -->
+      <!-- 찜 목록 헤더 -->
       <div
         class="relative h-[7%] font-extrabold text-xl flex items-center justify-center mb-4 mt-10"
       >
@@ -163,20 +164,34 @@
         />
       </div>
 
-      <!-- 결과 리스트 -->
-      <div
-        class="overflow-y-auto h-[730px] scrollbar-hide -mt-5 gap-y-2 flex flex-col"
-      >
-        <ResultCard v-for="list in tmpList" :data="list" />
+      <!-- 찜 목록 결과 리스트 -->
+      <div class="overflow-y-auto h-[730px] scrollbar-hide -mt-5">
+        <div v-if="!isLoading">
+          <div v-if="favoriteList.length > 0" class="gap-y-2 flex flex-col">
+            <FavoriteResultCard
+              v-for="item in displayedList"
+              :key="item.aptSeq"
+              :data="formatFavoriteData(item)"
+            />
+          </div>
+          <div v-else class="text-center py-8 text-gray-500">
+            찜한 매물이 없습니다.
+          </div>
+        </div>
+        <div v-else class="text-center py-8">
+          <span class="text-gray-500">로딩 중...</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick } from "vue";
+import axios from "@/plugins/axios";
+import { ref, reactive, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { searchDetail } from "@/api/search.js";
 import ResultCard from "@/components/ResultCard.vue";
+import FavoriteResultCard from "@/components/FavoriteResultCard.vue";
 import { useRouter, useRoute } from "vue-router";
 
 import "v3-infinite-loading/lib/style.css";
@@ -188,6 +203,7 @@ const isOpened = ref(false);
 // 상태 변수들
 const showForm = ref(true);
 const list = ref([]); // 전체 데이터
+const favoriteList = ref([]); // 서버에서 가져온 찜 목록 전체 데이터
 const displayedList = ref([]); // 화면에 보여질 데이터
 const currentPage = ref(1); // 현재 페이지
 const itemsPerPage = ref(5); // 페이지당 아이템 수
@@ -198,6 +214,87 @@ const maxLen = ref(0);
 const isLoadingFinish = ref(false); // 더 이상 로딩할 것이 없다는 것
 const start = ref(5);
 const end = ref(10);
+
+// 찜 목록 데이터 포맷팅 함수
+const formatFavoriteData = (item) => {
+  return {
+    houseInfo: {
+      aptNm: item.aptNm,
+      umdNm: item.umdNm,
+      roadNm: item.roadNm,
+      jibun: item.jibun,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      buildYear: item.buildYear,
+      floor: item.floor,
+      no: item.no,
+      excluUseAr: item.excluUseAr,
+      dealAmount: item.dealAmount,
+      aptSeq: item.aptSeq,
+    },
+  };
+};
+
+// 찜 목록 가져오기
+const fetchFavoriteList = async () => {
+  isLoading.value = true;
+  try {
+    const response = await axios.get("/favorite/list", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    });
+
+    console.log(response.data);
+
+    if (response.data && response.data.favoriteHouses) {
+      favoriteList.value = response.data.favoriteHouses;
+      displayedList.value = favoriteList.value.slice(0, itemsPerPage.value);
+    } else {
+      favoriteList.value = [];
+      displayedList.value = [];
+    }
+  } catch (error) {
+    console.error("찜 목록 가져오기 실패:", error);
+    favoriteList.value = [];
+    displayedList.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// 무한 스크롤 데이터 로드
+const loadMoreFavorites = ({ done }) => {
+  setTimeout(() => {
+    if (isLoadingFinish.value) {
+      done("empty");
+      return;
+    }
+
+    const nextStart = start.value;
+    const nextEnd = Math.min(end.value, maxLen.value);
+
+    if (nextStart >= maxLen.value) {
+      isLoadingFinish.value = true;
+      done("empty");
+      return;
+    }
+
+    const newItems = favoriteList.value.slice(nextStart, nextEnd);
+    if (newItems.length > 0) {
+      displayedList.value.push(...newItems);
+      console.log("Added new items:", newItems);
+      start.value = nextEnd;
+      end.value = nextEnd + itemsPerPage.value;
+    }
+
+    if (nextEnd >= maxLen.value) {
+      isLoadingFinish.value = true;
+    }
+
+    done("ok");
+  }, 1000);
+};
 
 const load = ({ done }) => {
   setTimeout(() => {
@@ -225,139 +322,6 @@ const selectedOptions = reactive({
   month: "",
 });
 
-const tmpList = reactive([
-  {
-    no: 1,
-    aptSeq: "11110-2224",
-    aptDong: " ",
-    floor: "9",
-    dealYear: 2011,
-    dealMonth: 11,
-    dealDay: 26,
-    excluUseAr: 59.92,
-    dealAmount: "38,000",
-    houseInfo: {
-      aptSeq: "11110-2224",
-      sggCd: "11110",
-      umdCd: "17500",
-      umdNm: "숭인동",
-      jibun: "2-1",
-      roadNmSggCd: "11110",
-      roadNm: "동망산길",
-      roadNmBonbun: "47",
-      roadNmBubun: "0",
-      aptNm: "종로센트레빌",
-      buildYear: 2008,
-      latitude: "37.5815574293752",
-      longitude: "127.015738287163",
-    },
-  },
-  {
-    no: 2,
-    aptSeq: "11110-31",
-    aptDong: " ",
-    floor: "3",
-    dealYear: 2011,
-    dealMonth: 11,
-    dealDay: 24,
-    excluUseAr: 83.83,
-    dealAmount: "26,500",
-    houseInfo: {
-      aptSeq: "11110-31",
-      sggCd: "11110",
-      umdCd: "17400",
-      umdNm: "창신동",
-      jibun: "578-5",
-      roadNmSggCd: "11110",
-      roadNm: "창신길",
-      roadNmBonbun: "20",
-      roadNmBubun: "0",
-      aptNm: "동대문맨션",
-      buildYear: 1973,
-      latitude: "37.5723822385791",
-      longitude: "127.011010638393",
-    },
-  },
-  {
-    no: 3,
-    aptSeq: "11110-86",
-    aptDong: " ",
-    floor: "3",
-    dealYear: 2011,
-    dealMonth: 11,
-    dealDay: 28,
-    excluUseAr: 84.84,
-    dealAmount: "33,000",
-    houseInfo: {
-      aptSeq: "11110-86",
-      sggCd: "11110",
-      umdCd: "18600",
-      umdNm: "신영동",
-      jibun: "254",
-      roadNmSggCd: "11110",
-      roadNm: "진흥로",
-      roadNmBonbun: "480",
-      roadNmBubun: "0",
-      aptNm: "대아파크빌",
-      buildYear: 1998,
-      latitude: "37.6058401893334",
-      longitude: "126.960276209248",
-    },
-  },
-  {
-    no: 4,
-    aptSeq: "11110-91",
-    aptDong: " ",
-    floor: "8",
-    dealYear: 2011,
-    dealMonth: 11,
-    dealDay: 1,
-    excluUseAr: 79.87,
-    dealAmount: "33,500",
-    houseInfo: {
-      aptSeq: "11110-91",
-      sggCd: "11110",
-      umdCd: "17400",
-      umdNm: "창신동",
-      jibun: "703",
-      roadNmSggCd: "11110",
-      roadNm: "낙산길",
-      roadNmBonbun: "198",
-      roadNmBubun: "0",
-      aptNm: "창신쌍용2",
-      buildYear: 1993,
-      latitude: "37.5803962235982",
-      longitude: "127.011011705247",
-    },
-  },
-  {
-    no: 5,
-    aptSeq: "11110-207",
-    aptDong: " ",
-    floor: "6",
-    dealYear: 2011,
-    dealMonth: 11,
-    dealDay: 28,
-    excluUseAr: 56.17,
-    dealAmount: "12,400",
-    houseInfo: {
-      aptSeq: "11110-207",
-      sggCd: "11110",
-      umdCd: "17400",
-      umdNm: "창신동",
-      jibun: "436-79",
-      roadNmSggCd: "11110",
-      roadNm: "청계천로",
-      roadNmBonbun: "295",
-      roadNmBubun: "0",
-      aptNm: "(436-79)",
-      buildYear: 1968,
-      latitude: "37.5700667120798",
-      longitude: "127.010670484701",
-    },
-  },
-]);
-
 const selects = reactive([
   { id: "sido", defaultText: "시도선택", options: [] },
   { id: "gugun", defaultText: "구군선택", options: [] },
@@ -370,9 +334,23 @@ const selects = reactive([
   { id: "month", defaultText: "매매월선택", options: [] },
 ]);
 
-// 데이터 초기화 및 로드
+// route 변경 감지하여 찜 목록 데이터 로드
+watch(
+  () => route.name,
+  (newRouteName) => {
+    if (newRouteName === "favorite") {
+      fetchFavoriteList();
+    }
+  }
+);
+
+// onMounted에서 fetchFavoriteList 제거
 onMounted(() => {
   fetchRegionData("sido", "*00000000");
+  // 현재 route가 favorite인 경우에만 데이터 로드
+  if (route.name === "favorite") {
+    fetchFavoriteList();
+  }
 });
 
 // 검색 버튼 클릭

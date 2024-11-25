@@ -20,13 +20,13 @@ const goMain = () => {
   console.log(isOpened);
   router.push({ name: "main" });
 };
-const goLike = () => {
-  if (route.name === "like") {
+const goFavorite = () => {
+  if (route.name === "favorite") {
     isOpened.value = !isOpened.value;
-  } else if (route.name !== "like" && isOpened.value === false) {
+  } else if (route.name !== "favorite" && isOpened.value === false) {
     isOpened.value = true;
   }
-  router.push({ name: "like" });
+  router.push({ name: "favorite" });
 };
 const goMyPage = () => {
   isOpened.value = false;
@@ -126,9 +126,9 @@ const logout = () => userStore.logout(); // 로그아웃
           <div
             :class="[
               'py-3 px-6 rounded-lg cursor-pointer flex items-center justify-between',
-              route.name === 'like' ? 'bg-[#f2f1ee]' : 'hover:bg-slate-100',
+              route.name === 'favorite' ? 'bg-[#f2f1ee]' : 'hover:bg-slate-100',
             ]"
-            @click="goLike"
+            @click="goFavorite"
           >
             <div>
               <font-awesome-icon

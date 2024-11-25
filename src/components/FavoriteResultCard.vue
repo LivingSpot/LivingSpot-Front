@@ -25,8 +25,10 @@ const emitCoordinates = () => {
 
 // 금액 포매터
 const formatAmount = (amount) => {
+  if (!amount) return "0";
+  amount = amount.toString().replace(/,/g, "");
   amount += "0000";
-  const number = parseInt(amount.replace(/,/g, ""));
+  const number = parseInt(amount);
   let result = "";
 
   if (number >= 100000000) {
@@ -58,12 +60,12 @@ const formatAmount = (amount) => {
     <div class="card-body">
       <div class="info-row">
         <span class="info-label">전용면적</span>
-        <span class="info-value">{{ data.excluUseAr || "정보 없음" }}㎡</span>
+        <span class="info-value">{{ data.houseInfo.excluUseAr || "정보 없음" }}㎡</span>
       </div>
       <div class="info-row">
         <span class="info-label">거래금액</span>
         <span class="info-value text-red-500 font-bold">{{
-          formatAmount(data.dealAmount || "0")
+          formatAmount(data.houseInfo.dealAmount)
         }}</span>
       </div>
     </div>
