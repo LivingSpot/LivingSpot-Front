@@ -64,6 +64,17 @@ const router = createRouter({
       name: "OAuth2Handler",
       component: () => import("@/views/OAuth2Handler.vue"),
     },
+    {
+      path: "/board/write",
+      name: "boardWrite",
+      component: () => import("@/components/Board/BoardWrite.vue"),
+    },
+    {
+      path: "/board/detail/:id",
+      name: "detail",
+      component: () => import("@/components/Board/BoardDetail.vue"),
+      props: true, // pk를 props로 전달
+    },
   ],
 });
 
