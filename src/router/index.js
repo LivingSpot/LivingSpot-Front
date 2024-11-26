@@ -12,8 +12,8 @@ const router = createRouter({
       meta: { layout: "default" }, // 기본 레이아웃
     },
     {
-      path: "/like",
-      name: "like",
+      path: "/favorite",
+      name: "favorite",
       component: () => import("../views/KaKaoMapView.vue"),
       meta: { layout: "default" }, // 기본 레이아웃
     },

@@ -1,15 +1,22 @@
 <script setup>
 import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useMapStore } from "@/stores/mapStore";
 import OverlayCard from "@/components/OverlayCard.vue";
+import FavoriteOverlayCard from "@/components/FavoriteOverlayCard.vue";
+
 import {
   KakaoMap,
   KakaoMapMarker,
   KakaoMapCustomOverlay,
 } from "vue3-kakao-maps";
 
+const route = useRoute();
+
 // Pinia Store 가져오기
 const mapStore = useMapStore();
+
+const isFavorite = ref(true);
 
 const visible = ref(true);
 const mapInstance = ref(); // KakaoMap 인스턴스 참조
@@ -32,6 +39,13 @@ const closeOverlay = () => {
 
 const onClickKakaoMapMarker = () => {
   visible.value = !visible.value;
+};
+
+const handleRemoveFavorite = (aptSeq) => {
+  // 찜 제거 후 필요한 처리
+  closeOverlay();
+  // 필요한 경우 부모 컴포넌트에 이벤트 전달
+  emit("favoriteRemoved", aptSeq);
 };
 
 console.log(mapStore.selectedCoordinates);
@@ -86,7 +100,8 @@ watch(
         @onLoadKakaoMapCustomOverlay="onLoadKakaoMapCustomOverlay"
         :visible="visible"
       >
-        <OverlayCard />
+        <OverlayCard v-if="route.name === 'main'" />
+        <FavoriteOverlayCard v-else-if="route.name === 'favorite'" />
       </KakaoMapCustomOverlay>
     </KakaoMap>
   </div>
