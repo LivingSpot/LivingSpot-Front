@@ -64,7 +64,22 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { reactive, onMounted, ref } from "vue";
+import { useUserStore } from "@/stores/userStore";
+import { writeArticle } from "@/api/board.js";
+import { useRouter, useRoute } from "vue-router";
+
+const userStore = useUserStore();
+
+const userName = ref("");
+const router = useRouter();
+const route = useRoute();
+
+onMounted(() => {
+  if (userStore.user?.name) {
+    userName.value = userStore.user?.name;
+  }
+});
 
 const types = [
   {
@@ -91,18 +106,19 @@ const types = [
 
 const form = reactive({
   title: "",
-  writer: "익명",
+  writer: userName,
   type: "",
   content: "",
 });
 
-const submitForm = () => {
-  if (form.title && form.type && form.content) {
-    console.log("작성된 게시글:", form);
-    alert("게시글이 성공적으로 작성되었습니다!");
-    resetForm();
-  } else {
-    alert("모든 필드를 채워주세요.");
+const submitForm = async () => {
+  try {
+    const response = await writeArticle(form.title, form.content, form.type);
+    // console.log(response);
+    router.push({ name: "board" });
+  } catch (error) {
+    console.error("검색 실패:", error);
+    alert("검색 실패: 다시 시도해주세요.");
   }
 };
 
