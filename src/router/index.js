@@ -70,7 +70,7 @@ const router = createRouter({
       component: () => import("@/components/Board/BoardWrite.vue"),
     },
     {
-      path: "/board/detail/:id",
+      path: "/board/detail/:articleNo",
       name: "detail",
       component: () => import("@/components/Board/BoardDetail.vue"),
       props: true, // pk를 props로 전달
